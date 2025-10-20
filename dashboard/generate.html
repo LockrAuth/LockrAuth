@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockr – Generate Key</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <nav>
+    <img src="../lockr.png" class="logo" alt="Lockr Logo" />
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="generate.html" class="active">Generate</a></li>
+      <li><a href="keys.html">Keys</a></li>
+      <li><a href="../login/login.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="center-card">
+      <h2>Generate New Key</h2>
+      <p class="subtitle">Create a new Lockr license key</p>
+
+      <button id="genBtn" class="generate-btn">Generate Key</button>
+      <div id="keyDisplay" class="key-display"></div>
+    </div>
+  </main>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    if (!localStorage.getItem('lockr_keys')) {
+      localStorage.setItem('lockr_keys', JSON.stringify([]));
+    }
+
+    function getKeys() {
+      return JSON.parse(localStorage.getItem('lockr_keys'));
+    }
+
+    function saveKeys(keys) {
+      localStorage.setItem('lockr_keys', JSON.stringify(keys));
+    }
+
+    function generateKey() {
+      const key = 'LK-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      const keys = getKeys();
+      keys.push({ key, status: 'active', created: new Date().toLocaleString() });
+      saveKeys(keys);
+      return key;
+    }
+
+    document.getElementById('genBtn').addEventListener('click', () => {
+      const newKey = generateKey();
+      const keyDisplay = document.getElementById('keyDisplay');
+      keyDisplay.textContent = `✅ ${newKey}`;
+      keyDisplay.classList.add('show');
+      showToast('✅ Key Generated Successfully!', 'success');
+    });
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.add("show"), 50);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

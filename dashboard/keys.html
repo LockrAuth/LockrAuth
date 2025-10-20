@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockr – Manage Keys</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <nav>
+    <img src="../lockr.png" class="logo" alt="Lockr Logo" />
+    <ul>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="generate.html">Generate</a></li>
+      <li><a href="keys.html" class="active">Keys</a></li>
+      <li><a href="../login/login.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="center-card keys-card">
+      <h2>Manage Your Keys</h2>
+      <p class="subtitle">View, edit, or delete your existing license keys</p>
+
+      <div class="table-container">
+        <table id="keysTable">
+          <thead>
+            <tr>
+              <th>License Key</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3>Edit Key</h3>
+      <input type="text" id="editInput" />
+      <div class="modal-actions">
+        <button class="action save" id="saveEdit">Save</button>
+        <button class="action cancel" id="cancelEdit">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    if (!localStorage.getItem('lockr_keys')) {
+      localStorage.setItem('lockr_keys', JSON.stringify([]));
+    }
+
+    function getKeys() { return JSON.parse(localStorage.getItem('lockr_keys')); }
+    function saveKeys(keys) { localStorage.setItem('lockr_keys', JSON.stringify(keys)); }
+
+    function deleteKey(index) {
+      const keys = getKeys();
+      keys.splice(index, 1);
+      saveKeys(keys);
+      renderKeys();
+      showToast("🗑️ Key Deleted", "error");
+    }
+
+    let currentEditIndex = null;
+    const editModal = document.getElementById("editModal");
+    const editInput = document.getElementById("editInput");
+
+    function openEdit(index) {
+      const keys = getKeys();
+      currentEditIndex = index;
+      editInput.value = keys[index].key;
+      editModal.classList.add("show");
+      editInput.focus();
+    }
+
+    function closeEdit() {
+      editModal.classList.remove("show");
+      currentEditIndex = null;
+    }
+
+    document.getElementById("saveEdit").addEventListener("click", () => {
+      if (currentEditIndex !== null) {
+        const keys = getKeys();
+        keys[currentEditIndex].key = editInput.value.trim();
+        saveKeys(keys);
+        renderKeys();
+        closeEdit();
+        showToast("✏️ Key Updated", "success");
+      }
+    });
+
+    document.getElementById("cancelEdit").addEventListener("click", closeEdit);
+
+    function renderKeys() {
+      const tbody = document.querySelector("#keysTable tbody");
+      const keys = getKeys();
+      tbody.innerHTML = "";
+
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#a7c4ff;">No keys yet. Generate one first!</td></tr>`;
+        return;
+      }
+
+      keys.forEach((k, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${k.key}</td>
+          <td>${k.created}</td>
+          <td>
+            <button class="action edit" onclick="openEdit(${i})">Edit</button>
+            <button class="action delete" onclick="deleteKey(${i})">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", renderKeys);
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.add("show"), 50);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

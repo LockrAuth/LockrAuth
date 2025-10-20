@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockr – Login</title>
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <header class="topbar">
+    <img src="../lockr.png" class="logo" alt="Lockr Logo">
+  </header>
+
+  <div class="auth-wrapper">
+    <div class="glass-card">
+      <h2>Welcome Back 👋</h2>
+      <p class="subtitle">Log in to continue to your dashboard</p>
+      <form onsubmit="login(event)">
+        <input type="email" placeholder="Email" required />
+        <input type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+      <a href="../register/register.html" class="link">
+        Don’t have an account? <b>Register</b>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+      alert("✅ Mock login successful! (Backend coming soon)");
+    }
+  </script>
+</body>
+</html>

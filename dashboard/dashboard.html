@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lockr – Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <nav>
+    <img src="../lockr.png" class="logo" alt="Lockr Logo" />
+    <ul>
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+      <li><a href="generate.html">Generate</a></li>
+      <li><a href="keys.html">Keys</a></li>
+      <li><a href="../login/login.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="center-card dashboard-card">
+      <h2>Dashboard Overview</h2>
+      <p class="subtitle">Here’s a summary of your license keys</p>
+
+      <div class="stats-container">
+        <div class="stat-box">
+          <h3>Total Keys</h3>
+          <p id="totalCount">0</p>
+        </div>
+        <div class="stat-box">
+          <h3>Active</h3>
+          <p id="activeCount">0</p>
+        </div>
+        <div class="stat-box">
+          <h3>Revoked</h3>
+          <p id="revokedCount">0</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toastContainer"></div>
+
+  <script>
+    const keys = JSON.parse(localStorage.getItem("lockr_keys") || "[]");
+    document.getElementById("totalCount").textContent = keys.length;
+    document.getElementById("activeCount").textContent = keys.filter(k => k.status === "active").length;
+    document.getElementById("revokedCount").textContent = keys.filter(k => k.status === "revoked").length;
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.classList.add("toast", type);
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.add("show"), 50);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
