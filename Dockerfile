@@ -1,14 +1,17 @@
-# Use a lightweight Java image
-FROM openjdk:17-jdk-slim
-
-# Set the working directory
+# Step 1: Build the app
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copy your compiled jar file
-COPY target/*.jar app.jar
+# Copy everything and build the jar
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Expose port 8080 (default for Spring Boot)
+# Step 2: Run the app
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+
+# Copy built jar from the previous step
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
-
-# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
